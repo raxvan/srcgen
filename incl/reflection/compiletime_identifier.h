@@ -4,6 +4,7 @@
 #pragma once
 
 #include "reflection_config.h"
+
 #ifdef __cpp_lib_source_location
 	#include <source_location>
 #include <string_view>
