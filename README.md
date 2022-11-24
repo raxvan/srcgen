@@ -10,7 +10,7 @@ You have an array of a base interface with class instances of type (A,B,C), and 
 
 ex: `get_instace_of<A>()->A_non_virtual_method()`
 
-You can find more examples in `examples/cpp_poly/`
+You can find more examples in `examples/reflection/`
 
 
 # What i want to add in the future:
