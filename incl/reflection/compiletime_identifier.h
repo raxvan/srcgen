@@ -14,10 +14,10 @@ namespace sg
 
 	struct compiletime_identifier
 	{
-	protected:
+	public:
 		const uint32_t hash = 0;
 		const uint32_t size = 0; // name size
-		const char*	   id = nullptr;
+		const char* const id = nullptr;
 
 	public:
 		inline bool operator==(const compiletime_identifier& other) const

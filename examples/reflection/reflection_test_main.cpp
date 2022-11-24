@@ -1,5 +1,6 @@
 
 #include "example1.h"
+#include <iostream>
 
 class base : public sg::InstanceDescriptor
 {
@@ -19,9 +20,9 @@ class type3 : public type2
 	CUSTOM_CLASS_NAME_EX(custom_name, type2);
 };
 
-void test_main()
+void test_instance_decl()
 {
-	base*		i = nullptr;
+	base* i = nullptr;
 	const base* ci = nullptr;
 
 	TEST_INLINE() = [&]() {
@@ -59,6 +60,27 @@ void test_main()
 		TTF_ASSERT(i->isinstance<type1>() == false);
 		TTF_ASSERT(ci->isinstance<type1>() == false);
 	};
+}
+
+void test_compiletime_identifier()
+{
+	constexpr sg::compiletime_identifier a = sg::compiletime_identifier::create("hello1");
+	constexpr sg::compiletime_identifier b = sg::compiletime_identifier::create("hello2_", 6); //this could cause some problems
+	constexpr sg::compiletime_identifier c = "hello3"_id;
+
+	static_assert(a.size == 6, "...");
+	static_assert(b.size == 6, "...");
+	static_assert(c.size == 6, "...");
+
+	std::cout << a.id << std::endl;
+	std::cout << b.id << std::endl;
+	std::cout << c.id << std::endl;
+}
+
+void test_main()
+{
+	TEST_FUNCTION(test_instance_decl);
+	TEST_FUNCTION(test_compiletime_identifier);
 }
 
 TEST_MAIN(test_main)
