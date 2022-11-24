@@ -1,61 +1,10 @@
 
 #pragma once
 
-#include "reflection_config.h"
-#ifdef __cpp_lib_source_location
-	#include <source_location>
-#include <string_view>
-#endif
+#include "compiletime_identifier.h"
 
 namespace sg
 {
-
-	struct compiletime_class_identifier
-	{
-	protected:
-		const char* 		name = nullptr;
-		const std::size_t 	size = 0;//name size
-
-	public:
-		inline bool operator == (const compiletime_class_identifier& other) const
-		{
-			return name == other.name && size == other.size;
-		}
-		inline bool operator != (const compiletime_class_identifier& other) const
-		{
-			return name != other.name || size != other.size;
-		}
-		inline bool operator < (const compiletime_class_identifier& other) const
-		{
-			if(name == other.name)
-				return size < other.size;
-			return name < other.name;
-		}
-
-	public:
-		constexpr compiletime_class_identifier(const char* s, const std::size_t sz)
-			:name(s)
-			,size(sz)
-		{}
-
-		static constexpr compiletime_class_identifier create(const char * n)
-		{
-			const char* s = n;
-			std::size_t sz = 0;
-			while (*s++ != '\0') sz++;
-			return compiletime_class_identifier{n,sz};
-		}
-
-#ifdef __cpp_lib_source_location
-		static constexpr compiletime_class_identifier create(const std::source_location& location)
-		{
-			return create(location.function_name());
-		}
-#endif
-
-	};
-
-	//--------------------------------------------------------------------------------------------------------------------------------
 
 	class InstanceDescriptor
 	{
@@ -63,8 +12,8 @@ namespace sg
 		template <class>
 		friend struct impl_instance_descriptor_helper;
 
-		virtual compiletime_class_identifier _get_final_instance_id() const = 0;
-		virtual bool _is_instance_recursive(const compiletime_class_identifier& ik) const = 0;
+		virtual compiletime_identifier _get_final_instance_id() const = 0;
+		virtual bool _is_instance_recursive(const compiletime_identifier& ik) const = 0;
 
 	public:
 		template <class T>
@@ -75,7 +24,7 @@ namespace sg
 		template <class T>
 		inline bool isinstance() const;
 
-		inline bool isinstance(const compiletime_class_identifier& tp) const;
+		inline bool isinstance(const compiletime_identifier& tp) const;
 	};
 
 	//--------------------------------------------------------------------------------------------------------------------------------
@@ -83,7 +32,7 @@ namespace sg
 	struct impl_instance_descriptor_helper
 	{
 		template <class T>
-		inline static bool impl_is_instance(const compiletime_class_identifier& ik, const T* th)
+		inline static bool impl_is_instance(const compiletime_identifier& ik, const T* th)
 		{
 			if(T::_get_type_id() == ik)
 				return true;
@@ -95,13 +44,13 @@ namespace sg
 	struct impl_instance_descriptor_helper <void>
 	{
 		template <class T>
-		inline static bool impl_is_instance(const compiletime_class_identifier& ik, const T*)
+		inline static bool impl_is_instance(const compiletime_identifier& ik, const T*)
 		{
 			return T::_get_type_id() == ik;
 		}
 
 		template <class T>
-		inline static compiletime_class_identifier impl_get_type_id()
+		inline static compiletime_identifier impl_get_type_id()
 		{
 			return T::_get_type_id();
 		}
@@ -112,7 +61,7 @@ namespace sg
 	template <class T>
 	struct class_identifier_from
 	{
-		inline static compiletime_class_identifier value()
+		inline static compiletime_identifier value()
 		{
 			return impl_instance_descriptor_helper<void>::impl_get_type_id<T>();
 		}
@@ -136,7 +85,7 @@ namespace sg
 	{
 		return _is_instance_recursive(impl_instance_descriptor_helper<void>::impl_get_type_id<T>());
 	}
-	inline bool InstanceDescriptor::isinstance(const compiletime_class_identifier& tp) const
+	inline bool InstanceDescriptor::isinstance(const compiletime_identifier& tp) const
 	{
 		return _is_instance_recursive(tp);
 	}
@@ -148,9 +97,9 @@ namespace sg
 
 
 #define IMPL_TYPEID_CUSTOM_STR(STR) \
-	static sg::compiletime_class_identifier _get_type_id() \
+	static sg::compiletime_identifier _get_type_id() \
 	{ \
-		constexpr auto r = sg::compiletime_class_identifier::create(#STR); \
+		constexpr auto r = sg::compiletime_identifier::create(#STR); \
 		return r; \
 	}
 
@@ -159,9 +108,9 @@ namespace sg
 #ifdef __cpp_lib_source_location
 
 #define IMPL_TYPEID_DEFAULT_STR() \
-	static sg::compiletime_class_identifier _get_type_id() \
+	static sg::compiletime_identifier _get_type_id() \
 	{ \
-		constexpr auto r = sg::compiletime_class_identifier::create(std::source_location::current()); \
+		constexpr auto r = sg::compiletime_identifier::create(std::source_location::current()); \
 		return r; \
 	}
 
@@ -174,9 +123,9 @@ namespace sg
 #define SRCGEN_LOCATION __FILE__ "::" SRCGEN_LINET_TO_STR_MACRO(__LINE__)
 
 #define IMPL_TYPEID_DEFAULT_STR() \
-	static sg::compiletime_class_identifier _get_type_id() \
+	static sg::compiletime_identifier _get_type_id() \
 	{ \
-		constexpr auto r = sg::compiletime_class_identifier::create(SRCGEN_LOCATION); \
+		constexpr auto r = sg::compiletime_identifier::create(SRCGEN_LOCATION); \
 		return r; \
 	}
 
@@ -187,11 +136,11 @@ namespace sg
 
 #define IMPL_CLASS_VIRTUAL_FUNCTIONS(BASE) \
 	template <class> friend struct sg::impl_instance_descriptor_helper; \
-	virtual sg::compiletime_class_identifier _get_final_instance_id() const  override \
+	virtual sg::compiletime_identifier _get_final_instance_id() const  override \
 	{ \
 		return _get_type_id(); \
 	} \
-	virtual bool _is_instance_recursive(const sg::compiletime_class_identifier& ik) const override \
+	virtual bool _is_instance_recursive(const sg::compiletime_identifier& ik) const override \
 	{ \
 		return sg::impl_instance_descriptor_helper<BASE>::impl_is_instance(ik, this); \
 	}
