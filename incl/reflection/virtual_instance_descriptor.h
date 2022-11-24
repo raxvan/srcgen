@@ -13,7 +13,7 @@ namespace sg
 		friend struct impl_instance_descriptor_helper;
 
 		virtual compiletime_identifier _get_final_instance_id() const = 0;
-		virtual bool _is_instance_recursive(const compiletime_identifier& ik) const = 0;
+		virtual bool				   _is_instance_recursive(const compiletime_identifier& ik) const = 0;
 
 	public:
 		template <class T>
@@ -34,14 +34,14 @@ namespace sg
 		template <class T>
 		inline static bool impl_is_instance(const compiletime_identifier& ik, const T* th)
 		{
-			if(T::_get_type_id() == ik)
+			if (T::_get_type_id() == ik)
 				return true;
 			return static_cast<const BASE*>(th)->BASE::_is_instance_recursive(ik);
 		}
 	};
 
 	template <>
-	struct impl_instance_descriptor_helper <void>
+	struct impl_instance_descriptor_helper<void>
 	{
 		template <class T>
 		inline static bool impl_is_instance(const compiletime_identifier& ik, const T*)
@@ -95,77 +95,69 @@ namespace sg
 //--------------------------------------------------------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------------------------------------------------------
 
-
-#define IMPL_TYPEID_CUSTOM_STR(STR) \
-	static sg::compiletime_identifier _get_type_id() \
-	{ \
+#define IMPL_TYPEID_CUSTOM_STR(STR)                                  \
+	static sg::compiletime_identifier _get_type_id()                 \
+	{                                                                \
 		constexpr auto r = sg::compiletime_identifier::create(#STR); \
-		return r; \
+		return r;                                                    \
 	}
 
 //--------------------------------------------------------------------------------------------------------------------------------
 
 #ifdef __cpp_lib_source_location
 
-#define IMPL_TYPEID_DEFAULT_STR() \
-	static sg::compiletime_identifier _get_type_id() \
-	{ \
-		constexpr auto r = sg::compiletime_identifier::create(std::source_location::current()); \
-		return r; \
-	}
-
+#	define IMPL_TYPEID_DEFAULT_STR()                                                               \
+		static sg::compiletime_identifier _get_type_id()                                            \
+		{                                                                                           \
+			constexpr auto r = sg::compiletime_identifier::create(std::source_location::current()); \
+			return r;                                                                               \
+		}
 
 #else
 
 // https://stackoverflow.com/questions/19343205/c-concatenating-file-and-line-macros/19343239
-#define SRCGEN_TO_STRING_MACRO_INTERNAL(A) #A
-#define SRCGEN_LINET_TO_STR_MACRO(A) SRCGEN_TO_STRING_MACRO_INTERNAL(A)
-#define SRCGEN_LOCATION __FILE__ "::" SRCGEN_LINET_TO_STR_MACRO(__LINE__)
+#	define SRCGEN_TO_STRING_MACRO_INTERNAL(A) #	   A
+#	define SRCGEN_LINET_TO_STR_MACRO(A) SRCGEN_TO_STRING_MACRO_INTERNAL(A)
+#	define SRCGEN_LOCATION __FILE__ "::" SRCGEN_LINET_TO_STR_MACRO(__LINE__)
 
-#define IMPL_TYPEID_DEFAULT_STR() \
-	static sg::compiletime_identifier _get_type_id() \
-	{ \
-		constexpr auto r = sg::compiletime_identifier::create(SRCGEN_LOCATION); \
-		return r; \
-	}
+#	define IMPL_TYPEID_DEFAULT_STR()                                               \
+		static sg::compiletime_identifier _get_type_id()                            \
+		{                                                                           \
+			constexpr auto r = sg::compiletime_identifier::create(SRCGEN_LOCATION); \
+			return r;                                                               \
+		}
 
 #endif
 
 //--------------------------------------------------------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------------------------------------------------------
 
-#define IMPL_CLASS_VIRTUAL_FUNCTIONS(BASE) \
-	template <class> friend struct sg::impl_instance_descriptor_helper; \
-	virtual sg::compiletime_identifier _get_final_instance_id() const  override \
-	{ \
-		return _get_type_id(); \
-	} \
+#define IMPL_CLASS_VIRTUAL_FUNCTIONS(BASE)                                                   \
+	template <class>                                                                         \
+	friend struct sg::impl_instance_descriptor_helper;                                       \
+	virtual sg::compiletime_identifier _get_final_instance_id() const override               \
+	{                                                                                        \
+		return _get_type_id();                                                               \
+	}                                                                                        \
 	virtual bool _is_instance_recursive(const sg::compiletime_identifier& ik) const override \
-	{ \
-		return sg::impl_instance_descriptor_helper<BASE>::impl_is_instance(ik, this); \
+	{                                                                                        \
+		return sg::impl_instance_descriptor_helper<BASE>::impl_is_instance(ik, this);        \
 	}
 
 //--------------------------------------------------------------------------------------------------------------------------------
 
-#define CUSTOM_CLASS_NAME(STR) \
+#define CUSTOM_CLASS_NAME(STR)   \
 	IMPL_TYPEID_CUSTOM_STR(STR); \
 	IMPL_CLASS_VIRTUAL_FUNCTIONS(void)
 
-
-#define DEFAULT_CLASS_NAME() \
+#define DEFAULT_CLASS_NAME()   \
 	IMPL_TYPEID_DEFAULT_STR(); \
 	IMPL_CLASS_VIRTUAL_FUNCTIONS(void)
 
-#define CUSTOM_CLASS_NAME_EX(STR,B) \
-	IMPL_TYPEID_CUSTOM_STR(STR); \
+#define CUSTOM_CLASS_NAME_EX(STR, B) \
+	IMPL_TYPEID_CUSTOM_STR(STR);     \
 	IMPL_CLASS_VIRTUAL_FUNCTIONS(B)
-
 
 #define DEFAULT_CLASS_NAME_EX(B) \
-	IMPL_TYPEID_DEFAULT_STR(); \
+	IMPL_TYPEID_DEFAULT_STR();   \
 	IMPL_CLASS_VIRTUAL_FUNCTIONS(B)
-
-
-
-
-

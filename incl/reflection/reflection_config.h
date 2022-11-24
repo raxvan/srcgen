@@ -29,14 +29,14 @@ namespace cllio
 }
 
 #		define REFLECTION_ASSERT(_COND)                                  \
-			do                                                       \
-			{                                                        \
-				if (!(_COND))                                        \
+			do                                                            \
+			{                                                             \
+				if (!(_COND))                                             \
 					reflection_assert_failed(__FILE__, __LINE__, #_COND); \
 			} while (false)
 #		define REFLECTION_ASSERT_FALSE(CSTR_MSG)                       \
-			do                                                     \
-			{                                                      \
+			do                                                          \
+			{                                                           \
 				reflection_assert_failed(__FILE__, __LINE__, CSTR_MSG); \
 			} while (false)
 #	endif
@@ -48,15 +48,15 @@ namespace cllio
 #ifndef REFLECTION_ASSERT
 
 #	define REFLECTION_ASSERT(...) \
-		do                    \
-		{                     \
+		do                         \
+		{                          \
 		} while (false)
 #endif
 
 #ifndef REFLECTION_ASSERT_FALSE
 #	define REFLECTION_ASSERT_FALSE(...) \
-		do                          \
-		{                           \
+		do                               \
+		{                                \
 			REFLECTION_ASSERT(false);    \
 		} while (false)
 

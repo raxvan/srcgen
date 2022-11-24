@@ -21,7 +21,7 @@ class type3 : public type2
 
 void test_main()
 {
-	base* i = nullptr;
+	base*		i = nullptr;
 	const base* ci = nullptr;
 
 	TEST_INLINE() = [&]() {
@@ -60,6 +60,5 @@ void test_main()
 		TTF_ASSERT(ci->isinstance<type1>() == false);
 	};
 }
-
 
 TEST_MAIN(test_main)
