@@ -1,7 +1,7 @@
 
 #include "example1.h"
 #include <iostream>
-
+#include <vector>
 class base : public sg::InstanceDescriptor
 {
 };
@@ -19,6 +19,32 @@ class type3 : public type2
 {
 	CUSTOM_CLASS_NAME_EX(custom_name, type2);
 };
+
+void test_type_visit()
+{
+	struct Visiter : public sg::InstanceDescriptor::ITypeVisiter
+	{
+		std::vector<sg::compiletime_identifier> data;
+		virtual void operator ()(const sg::compiletime_identifier& i) override
+		{
+			data.push_back(i);
+		}
+	};
+	type3 t;
+	Visiter v;
+	t.visit_types(v);
+
+	auto f = [&](const sg::compiletime_identifier& i) {
+		auto itr = std::find(v.data.begin(), v.data.end(), i);
+		return itr != v.data.end();
+	};
+
+	TTF_ASSERT(f(sg::class_identifier_from<type1>::value()) == false);
+	TTF_ASSERT(f(sg::class_identifier_from<type1>::value()) == true);
+	TTF_ASSERT(f(sg::class_identifier_from<type3>::value()) == true);
+
+	
+}
 
 void test_instance_decl()
 {
