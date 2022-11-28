@@ -71,7 +71,7 @@ namespace sg
 		}
 
 		template <class T>
-		inline static compiletime_identifier impl_get_static_type_id()
+		constexpr static compiletime_identifier impl_get_static_type_id()
 		{
 			return T::_get_static_type_id();
 		}
@@ -82,7 +82,7 @@ namespace sg
 	template <class T>
 	struct class_identifier_from
 	{
-		inline static compiletime_identifier value()
+		constexpr static compiletime_identifier value()
 		{
 			return impl_instance_descriptor_helper<void>::impl_get_static_type_id<T>();
 		}
@@ -125,7 +125,7 @@ namespace sg
 //--------------------------------------------------------------------------------------------------------------------------------
 
 #define IMPL_TYPEID_CUSTOM_STR(STR)                                  \
-	static sg::compiletime_identifier _get_static_type_id()                 \
+	constexpr static sg::compiletime_identifier _get_static_type_id()                 \
 	{                                                                \
 		constexpr auto r = sg::compiletime_identifier::create(#STR); \
 		return r;                                                    \
@@ -133,10 +133,10 @@ namespace sg
 
 //--------------------------------------------------------------------------------------------------------------------------------
 
-#ifdef __cpp_lib_source_location
-
+#if defined(__cpp_lib_source_location) && 0
+	//this seems to be broken on msvc, switching to "default"
 #	define IMPL_TYPEID_DEFAULT_STR()                                                               \
-		static sg::compiletime_identifier _get_static_type_id()                                            \
+		constexpr static sg::compiletime_identifier _get_static_type_id()                                            \
 		{                                                                                           \
 			constexpr auto r = sg::compiletime_identifier::create(std::source_location::current()); \
 			return r;                                                                               \
@@ -150,7 +150,7 @@ namespace sg
 #	define SRCGEN_LOCATION __FILE__ "::" SRCGEN_LINET_TO_STR_MACRO(__LINE__)
 
 #	define IMPL_TYPEID_DEFAULT_STR()                                               \
-		static sg::compiletime_identifier _get_static_type_id()                            \
+		constexpr static sg::compiletime_identifier _get_static_type_id()                            \
 		{                                                                           \
 			constexpr auto r = sg::compiletime_identifier::create(SRCGEN_LOCATION); \
 			return r;                                                               \

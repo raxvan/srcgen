@@ -1,24 +1,11 @@
 
-#include "example1.h"
+#include "helpers/test_type1.h"
+#include "helpers/test_type2.h"
+#include "helpers/test_type3.h"
+#include "helpers/test_type4.h"
 #include <iostream>
 #include <vector>
-class base : public sg::InstanceDescriptor
-{
-};
 
-class type1 : public base
-{
-	DEFAULT_CLASS_NAME();
-};
-class type2 : public base
-{
-	CUSTOM_CLASS_NAME(custom_name);
-};
-
-class type3 : public type2
-{
-	CUSTOM_CLASS_NAME_EX(custom_name, type2);
-};
 
 void test_type_visit()
 {
@@ -30,7 +17,7 @@ void test_type_visit()
 			data.push_back(i);
 		}
 	};
-	type3 t;
+	test_type4 t;
 	Visiter v;
 	t.visit_types(v);
 
@@ -39,52 +26,74 @@ void test_type_visit()
 		return itr != v.data.end();
 	};
 
-	TTF_ASSERT(f(sg::class_identifier_from<type1>::value()) == false);
-	TTF_ASSERT(f(sg::class_identifier_from<type1>::value()) == true);
-	TTF_ASSERT(f(sg::class_identifier_from<type3>::value()) == true);
+	TTF_ASSERT(f(sg::class_identifier_from<test_type1>::value()) == false);
+	TTF_ASSERT(f(sg::class_identifier_from<test_type3>::value()) == false);
+	TTF_ASSERT(f(sg::class_identifier_from<test_type2>::value()) == true);
+	TTF_ASSERT(f(sg::class_identifier_from<test_type4>::value()) == true);
 
 	
 }
 
+template <class T>
+void validate_is_instance(const base_type* ct, base_type* t)
+{
+	TTF_ASSERT(ct->isinstance<T>() && ct->cast<T>() != nullptr);
+	TTF_ASSERT(t->isinstance<T>() && t->cast<T>() != nullptr);
+}
+template <class T>
+void validate_is_not(const base_type* ct, base_type* t)
+{
+	TTF_ASSERT(ct->isinstance<T>() == false);
+	TTF_ASSERT(t->isinstance<T>() == false);
+}
+
 void test_instance_decl()
 {
-	base* i = nullptr;
-	const base* ci = nullptr;
+	base_type* i = nullptr;
+	const base_type* ci = nullptr;
 
 	TEST_INLINE() = [&]() {
-		type1 t;
+		test_type1 t;
 		i = &t;
 		ci = &t;
-		TTF_ASSERT(i->isinstance<type1>() && i->cast<type1>() != nullptr);
-		TTF_ASSERT(ci->isinstance<type1>() && ci->cast<type1>() != nullptr);
+		validate_is_instance<test_type1>(ci,i);
 
-		TTF_ASSERT(i->isinstance<type2>() == false);
-		TTF_ASSERT(ci->isinstance<type2>() == false);
+		validate_is_not<test_type2>(ci,i);
+		validate_is_not<test_type3>(ci,i);
+		validate_is_not<test_type4>(ci,i);
 	};
 
 	TEST_INLINE() = [&]() {
-		type2 t;
+		test_type2 t;
 		i = &t;
 		ci = &t;
-		TTF_ASSERT(i->isinstance<type2>() && i->cast<type2>() != nullptr);
-		TTF_ASSERT(ci->isinstance<type2>() && ci->cast<type2>() != nullptr);
+		validate_is_instance<test_type2>(ci,i);
 
-		TTF_ASSERT(i->isinstance<type1>() == false);
-		TTF_ASSERT(ci->isinstance<type1>() == false);
+		validate_is_not<test_type1>(ci,i);
+		validate_is_not<test_type3>(ci,i);
+		validate_is_not<test_type4>(ci,i);
 	};
 
 	TEST_INLINE() = [&]() {
-		type3 t;
+		test_type3 t;
 		i = &t;
 		ci = &t;
-		TTF_ASSERT(i->isinstance<type3>() && i->cast<type3>() != nullptr);
-		TTF_ASSERT(ci->isinstance<type3>() && ci->cast<type3>() != nullptr);
+		validate_is_instance<test_type3>(ci,i);
 
-		TTF_ASSERT(i->isinstance<type2>() && i->cast<type2>() != nullptr);
-		TTF_ASSERT(ci->isinstance<type2>() && ci->cast<type2>() != nullptr);
+		validate_is_not<test_type1>(ci,i);
+		validate_is_not<test_type2>(ci,i);
+		validate_is_not<test_type4>(ci,i);
+	};
 
-		TTF_ASSERT(i->isinstance<type1>() == false);
-		TTF_ASSERT(ci->isinstance<type1>() == false);
+	TEST_INLINE() = [&]() {
+		test_type4 t;
+		i = &t;
+		ci = &t;
+		validate_is_instance<test_type2>(ci,i);
+		validate_is_instance<test_type4>(ci,i);
+
+		validate_is_not<test_type1>(ci,i);
+		validate_is_not<test_type3>(ci,i);
 	};
 }
 
@@ -105,8 +114,9 @@ void test_compiletime_identifier()
 
 void test_main()
 {
-	TEST_FUNCTION(test_instance_decl);
 	TEST_FUNCTION(test_compiletime_identifier);
+	TEST_FUNCTION(test_instance_decl);
+	TEST_FUNCTION(test_type_visit);
 }
 
 TEST_MAIN(test_main)

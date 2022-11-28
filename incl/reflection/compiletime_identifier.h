@@ -15,9 +15,9 @@ namespace sg
 	struct compiletime_identifier
 	{
 	public:
-		const uint32_t hash = 0;
-		const uint32_t size = 0; // name size
-		const char* const id = nullptr;
+		uint32_t hash = 0;
+		uint32_t size = 0; // name size
+		const char* id = nullptr;
 
 	public:
 		inline bool operator==(const compiletime_identifier& other) const
@@ -43,6 +43,9 @@ namespace sg
 		compiletime_identifier() = default;
 		compiletime_identifier(const compiletime_identifier&) = default;
 		compiletime_identifier& operator=(const compiletime_identifier&) = default;
+
+		compiletime_identifier(compiletime_identifier&&) = default;
+		compiletime_identifier& operator=(compiletime_identifier&&) = default;
 
 	private:
 		constexpr compiletime_identifier(const uint32_t h, const uint32_t s, const char* i)

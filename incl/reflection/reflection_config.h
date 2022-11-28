@@ -23,7 +23,7 @@
 
 //--------------------------------------------------------------------------------------------------------------------------------
 
-namespace cllio
+namespace sg
 {
 	extern "C++" void reflection_assert_failed(const char* file, const int line, const char* cond);
 }
