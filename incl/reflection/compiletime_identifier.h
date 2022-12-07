@@ -27,6 +27,10 @@ namespace sg
 				return std::hash<const void*> {}(e.id);
 			}
 		};
+		inline std::string_view std_string_view() const
+		{
+			return std::string_view(id, size);
+		}
 	public:
 		inline bool operator==(const compiletime_identifier& other) const
 		{
@@ -54,7 +58,6 @@ namespace sg
 
 		compiletime_identifier(compiletime_identifier&&) = default;
 		compiletime_identifier& operator=(compiletime_identifier&&) = default;
-
 	private:
 		constexpr compiletime_identifier(const uint32_t h, const uint32_t s, const char* i)
 			: hash(h)
