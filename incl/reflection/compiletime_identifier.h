@@ -20,6 +20,14 @@ namespace sg
 		const char* id = nullptr;
 
 	public:
+		struct hash_operator
+		{
+			inline std::size_t operator()(const compiletime_identifier& e) const
+			{
+				return std::hash<const void*> {}(e.id);
+			}
+		};
+	public:
 		inline bool operator==(const compiletime_identifier& other) const
 		{
 			return hash == other.hash && size == other.size && id == other.id;
