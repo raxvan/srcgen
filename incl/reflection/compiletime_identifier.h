@@ -1,7 +1,5 @@
 #pragma once
 
-#pragma once
-
 #include "reflection_config.h"
 
 #ifdef __cpp_lib_source_location
@@ -32,6 +30,8 @@ namespace sg
 			return std::string_view(id, size);
 		}
 	public:
+		bool is(const std::string_view& sv) const;
+
 		inline bool operator==(const compiletime_identifier& other) const
 		{
 			return hash == other.hash && size == other.size && id == other.id;
