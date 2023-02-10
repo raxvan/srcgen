@@ -4,13 +4,15 @@ I find myself needing more and more a bunch of code that mostly runs at compilet
 
 # What you can find
 
-## c++ reflection code for polymorphic types
+## cppreflect: c++ reflection code for polymorphic types
 
 You have an array of a base interface with class instances of type (A,B,C), and you want to instance by type, with minimal code written:
 
 ex: `get_instace_of<A>()->A_non_virtual_method()`
 
 You can find more examples in `examples/reflection/`
+
+## enumgen: c++ code generator for enums:
 
 
 # What i want to add in the future:

@@ -1,4 +1,5 @@
-/prj/build
+/cppreflect/prj/build
+/enumgen/prj/build
 __pycache__
 *.pyc
 
