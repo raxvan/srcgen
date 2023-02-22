@@ -7,17 +7,17 @@ namespace test_enum
 			return TestEnum::Enum::kCount;
 		switch (nmsize)
 		{
-			case 11:
+			case 10:
 			{
-				if (std::strncmp(_name, "uEnumValueB", 11) == 0)
+				if (std::strncmp(_name, "EnumValueB", 10) == 0)
 					return Enum::kEnumValueB;
-				if (std::strncmp(_name, "uEnumValueA", 11) == 0)
+				if (std::strncmp(_name, "EnumValueA", 10) == 0)
 					return Enum::kEnumValueA;
 				break;
 			}
-			case 12:
+			case 11:
 			{
-				if (std::strncmp(_name, "uEnumValueAB", 12) == 0)
+				if (std::strncmp(_name, "EnumValueAB", 11) == 0)
 					return Enum::kEnumValueAB;
 				break;
 			}
@@ -29,9 +29,9 @@ namespace test_enum
 	{
 		switch(v)
 		{
-			case Enum::kEnumValueA  : return std::string_view("uEnumValueA", 11);
-			case Enum::kEnumValueB  : return std::string_view("uEnumValueB", 11);
-			case Enum::kEnumValueAB : return std::string_view("uEnumValueAB", 12);
+			case Enum::kEnumValueA  : return std::string_view("EnumValueA", 10);
+			case Enum::kEnumValueB  : return std::string_view("EnumValueB", 10);
+			case Enum::kEnumValueAB : return std::string_view("EnumValueAB", 11);
 			default:break;
 		}
 		return {};

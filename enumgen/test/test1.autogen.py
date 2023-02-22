@@ -1,14 +1,16 @@
 
 
-def make_enum(ctx):
+def construct(ctx):
 
 	ctx.add("EnumValueB")
 	ctx.add("EnumValueA")
 	ctx.add("EnumValueAB")
 
 
-	ctx.cppPrefix = "k"
-	ctx.strPtrfix = "u"
+def generate_cpp_enum(ctx):
+
+	ctx.enumPrefix = "k"
+	ctx.aliasPrefix = "u"
 
 	ctx.namespace = "test_enum"
 	ctx.classname = "TestEnum"

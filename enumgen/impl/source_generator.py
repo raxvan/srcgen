@@ -1,80 +1,81 @@
 
+import sys
 import importlib.util
-import cpp_generator
-
-class EnumBuilder():
-	def __init__(self, name):
-
-		self._name = name
-
-		self.keyvalues = {} #key alias
-		self.keylength = {}
-		self.aliaslength = {}
-
-		self.enumPrefix = "k"
-		self.aliasPtrfix = ""
-
-		self.namespace = None
-		self.classname = None
-		self.output = None
 
 
-		self._max_alias_len = 0
-		self._min_alias_len = 100000
+class EnumDesc():
+	def __init__(self, _name):
 
-		self._max_name_len = 0
-		self._min_name_len = 100000
+		self.name = _name
+		self.keys = {} # key -> data
 
-	def add_internal(self, name, alias):
-		self.keyvalues.setdefault(name, set()).add(alias)
+		self._max_key_length = 0
+		self._min_key_length = sys.maxsize
 
-		nlen = len(name)
-		if nlen > self._max_name_len:
-			self._max_name_len = nlen
-		elif nlen < self._min_name_len:
-			self._min_name_len = nlen
+		self._index_order = None
 
-		alen = len(alias)
-		if alen > self._max_alias_len:
-			self._max_alias_len = alen
-		elif alen < self._min_alias_len:
-			self._min_alias_len = alen
+	def add(self, name, **kwargs):
+		if name in self.keys:
+			raise Exception(f"Duplicate enum key {name}!")
+		self.keys[name] = kwargs
 
-		self.keylength.setdefault(nlen, []).append(name)
-		self.aliaslength.setdefault(alen, []).append((name,alias))
+		kl = len(name)
+		self._max_key_length = max(self._max_key_length, kl)
+		self._min_key_length = min(self._min_key_length, kl)
 
-	def map_to_index(self):
+	def create_index_order(self):
+		sorted_keys = sorted(self.keys, key = lambda x: (len(x), x))
 		index = 0
 		result = []
-		sk = sorted([k for k,_ in self.keyvalues.items()], key = lambda x: (len(x), x))
-		for s in sk:
-			result.append((s,index))
+		for k in sorted_keys:
+			result.append((k, index))
 			index = index + 1
 
+		self._index_order = result
 		return result
 
-	def add(self, name, alias = None):
-		if alias != None:
-			self.add_internal(name, alias)
-		else:
-			self.add_internal(name, name)
+	def get_order(self):
+		return self._index_order
 
+	def get_names(self):
+		return self.keys.keys()
+
+	def get_property(self, name, *args):
+		v = self.keys[name]
+
+		for a in args:
+			r = v.get(a,None)
+			if r != None:
+				return r
+
+		return v
+
+################################################################################################################################################################
 
 def _load_module(abs_path_to_pyfile, load_location):
 	ll = "enumpak." + load_location
 	spec = importlib.util.spec_from_file_location(ll, abs_path_to_pyfile)
 	module_context = importlib.util.module_from_spec(spec)
 	spec.loader.exec_module(module_context)
-
 	return module_context
 
-def generate(name, inputenum, baseout):
-	ctx = _load_module(inputenum, name)
+def generate(name, module, baseout):
+	ctx = _load_module(module, name)
 
-	if hasattr(ctx, "make_enum") != False:
-		eb = EnumBuilder(name)
-		make_enum_func = getattr(ctx,"make_enum")
-		make_enum_func(eb)
-		cpp_generator.build(eb, baseout)
+	evalue = None
+
+	if hasattr(ctx, "construct"):
+		construct_func = getattr(ctx,"construct")
+		evalue = EnumDesc(name)
+		construct_func(evalue)
+
+	if hasattr(ctx, "generate_cpp_enum"):
+		import cpp_generator
+		generate_func = getattr(ctx,"generate_cpp_enum")
+		ctx = cpp_generator.EnumBuilder(evalue, baseout)
+		generate_func(ctx)
+		ctx.build()
+
+
 
 

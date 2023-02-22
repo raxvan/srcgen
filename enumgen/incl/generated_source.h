@@ -26,6 +26,10 @@ namespace gs
 			return B::parse(sv.data(), sv.size());
 		}
 	public:
+		inline static bool valid(const uint32_t ev)
+		{
+			return ev < base_enum_t::kCount;
+		}
 		inline static uint32_t index(const base_enum_t ev)
 		{
 			return uint32_t(ev);
