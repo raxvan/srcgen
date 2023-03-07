@@ -91,9 +91,9 @@ def generate(name, module, baseout):
 		import cpp_generator
 		generate_func = getattr(ctx,"generate_cpp_enum")
 
-		ctx = cpp_generator.EnumBuilder(EnumConstructor(evalue), baseout)
+		ctx = cpp_generator.EnumBuilder(EnumConstructor(evalue))
 		generate_func(ctx)
-		ctx.build()
+		ctx.build([module], baseout)
 
 
 
