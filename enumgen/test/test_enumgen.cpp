@@ -5,12 +5,22 @@
 
 using namespace test_enum;
 
-void test_main()
+void test_all_visit()
 {
 	using t = gs::EnumUtils<TestEnum>;
 
-	TEST_ASSERT(t::parse(t::name(t::kEnumValueA)) == t::kEnumValueA);
-	TEST_ASSERT(t::parse(t::name(t::kEnumValueB)) == t::kEnumValueB);
-	TEST_ASSERT(t::parse(t::name(t::kEnumValueAB)) == t::kEnumValueAB);
+	uint32_t index = 0;
+	t::iterate([&](t::Enum e) {
+		TEST_ASSERT(t::parse(t::name(e)) == e);
+		TEST_ASSERT(index == t::index(e));
+		TEST_ASSERT(e == t::parse(index));
+		index++;
+		});
+}
+
+void test_main()
+{
+	TEST_FUNCTION(test_all_visit);
+
 }
 TEST_MAIN(test_main)

@@ -40,6 +40,13 @@ namespace gs
 		{
 			return name(parse(index));
 		}
+
+		template <class F>
+		static void iterate(const F& _func)
+		{
+			for(uint32_t i = 0; i < base_enum_t::kCount; i++)
+				_func(parse(i));
+		}
 	};
 
 };

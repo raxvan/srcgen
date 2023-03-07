@@ -10,6 +10,10 @@ def construct(ctx):
 
 	ctx.fscan("src: ../incl")
 
+def autogenerate():
+	return [
+		"../test/test1.autogen.py"
+	]
 
 def configure(cfg):
 	cfg.link("../../../ttf/testing.pak.py").enable()
