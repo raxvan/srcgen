@@ -1,5 +1,6 @@
 /cppreflect/prj/build
 /enumgen/prj/build
+/enumgen/test/out
 __pycache__
 *.pyc
 
