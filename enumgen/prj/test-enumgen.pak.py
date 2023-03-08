@@ -12,7 +12,8 @@ def construct(ctx):
 
 def autogenerate():
 	return [
-		"../test/test1.autogen.py"
+		"../test/test1.autogen.py",
+		"../test/other/test1.autogen.py"
 	]
 
 def configure(cfg):

@@ -1,6 +1,7 @@
 
 import os
 
+
 def write_to_file(content, file):
 	f = open(file, "w")
 	f.write(content)
@@ -9,6 +10,9 @@ def write_to_file(content, file):
 
 def append(line, depth, content):
 	return line + "\t" * depth + content + "\n"
+
+def simple_hash(s):
+	return 0
 
 ################################################################################################
 ################################################################################################
@@ -161,8 +165,13 @@ class EnumBuilder():
 		s = append(s, depth + 1, f"if (_name == nullptr || nmsize <= {prefixlen})")
 		s = append(s, depth + 2, f"return {self.classname}::Enum::kCount;")
 
-		s = append(s, depth + 1, "auto test_with_str = [=](const char* eref, const std::size_t sz) -> bool {")
-		s = append(s, depth + 2, f"return std::strncmp(_name + {prefixlen}, eref + {prefixlen}, sz - {prefixlen}) == 0;")
+		s = append(s, depth + 1, f'if(std::strncmp(_name, "{self.aliasPrefix}", {prefixlen}) != 0)')
+		s = append(s, depth + 2, f"return {self.classname}::Enum::kCount;")
+		s = append(s, depth + 1, "const char* test_str = _name + 6;")
+		s = append(s, depth + 1, "std::size_t test_size = nmsize - 6;")
+		s = append(s, depth + 1, "uint32_t name_hash = gs::utils::simple_string_hash(test_str, test_size);")
+		s = append(s, depth + 1, "auto test_alias = [=](const char* eref) -> bool {")
+		s = append(s, depth + 2, f"return std::strncmp(eref + {prefixlen}, test_str, test_size) == 0;")
 		s = append(s, depth + 1, "};")
 
 
@@ -179,7 +188,7 @@ class EnumBuilder():
 			items_with_this_length = lengths[current_size]
 
 			for kname, aname in items_with_this_length:
-				s = append(s, depth + 3, f'if (test_with_str("{self.aliasPrefix}{aname}", {case_size}))')
+				s = append(s, depth + 3, f'if (name_hash == {simple_hash(aname)} name_hashtest_alias("{self.aliasPrefix}{aname}"))')
 				s = append(s, depth + 4, f'return Enum::{self.enumPrefix}{kname};')
 
 			s = append(s, depth + 3, f'break;')

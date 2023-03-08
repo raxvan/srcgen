@@ -7,6 +7,19 @@
 namespace gs
 {
 
+	struct utils
+	{
+		static inline uint32_t simple_string_hash(const char* s, const std::size_t sz)
+		{
+			uint32_t hash = 5381;
+			for(std::size_t i = 0; i < sz;i++)
+			{
+				hash = ((hash << 5) + hash) + (*s++);
+			}
+			return hash;
+		}
+	};
+
 	template <class B>
 	struct EnumUtils : public B
 	{
@@ -30,6 +43,10 @@ namespace gs
 		{
 			return ev < base_enum_t::kCount;
 		}
+		inline static bool valid(const base_enum_t ev)
+		{
+			return ev != base_enum_t::kCount;
+		}
 		inline static uint32_t index(const base_enum_t ev)
 		{
 			return uint32_t(ev);
@@ -47,6 +64,7 @@ namespace gs
 			for(uint32_t i = 0; i < base_enum_t::kCount; i++)
 				_func(parse(i));
 		}
+
 	};
 
 };

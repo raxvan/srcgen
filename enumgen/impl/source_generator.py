@@ -1,4 +1,5 @@
 
+import os
 import sys
 import importlib.util
 
@@ -78,22 +79,34 @@ def _load_module(abs_path_to_pyfile, load_location):
 	spec.loader.exec_module(module_context)
 	return module_context
 
-def generate(name, module, baseout):
-	ctx = _load_module(module, name)
-
+def generate(name, module_list):
 	evalue = EnumDesc(name)
 
-	if hasattr(ctx, "construct"):
-		construct_func = getattr(ctx,"construct")
-		construct_func(evalue)
+	contexts = []
+	index = 0
+	for module_abs_path in module_list:
+		ctx = _load_module(module_abs_path, name + str(index))
+		index = index + 1
+		if hasattr(ctx, "construct"):
+			construct_func = getattr(ctx,"construct")
+			construct_func(evalue)
 
-	if hasattr(ctx, "generate_cpp_enum"):
-		import cpp_generator
-		generate_func = getattr(ctx,"generate_cpp_enum")
+		contexts.append((ctx, module_abs_path))
 
-		ctx = cpp_generator.EnumBuilder(EnumConstructor(evalue))
-		generate_func(ctx)
-		ctx.build([module], baseout)
+	for ctx, abspath in contexts:
+		if hasattr(ctx, "generate_cpp_enum"):
+			import cpp_generator
+			generate_func = getattr(ctx,"generate_cpp_enum")
+
+			ctx = cpp_generator.EnumBuilder(EnumConstructor(evalue))
+			generate_func(ctx)
+
+			basepath, name = os.path.split(abspath)
+			ctx.build(module_list, basepath)
+
+	return evalue
+
+
 
 
 
