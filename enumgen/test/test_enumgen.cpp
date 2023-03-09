@@ -28,9 +28,29 @@ void test_all_visit()
 
 }
 
+
+void test_speed()
+{
+	using t = gs::EnumUtils<TestEnum>;
+	std::size_t c = 0;
+	std::size_t total = 1024;
+	for (std::size_t i = 0; i < total; i++)
+	{
+		bool b = true;
+		t::iterate([&](t::Enum e) {
+			b = b && t::parse(t::name(e)) == e;
+			});
+		if (b)
+			c++;
+	}
+
+	TEST_ASSERT(c == total);
+}
+
 void test_main()
 {
 	TEST_FUNCTION(test_all_visit);
+	TEST_FUNCTION(test_speed);
 
 }
 TEST_MAIN(test_main)

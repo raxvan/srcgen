@@ -1,8 +1,4 @@
 
 def construct(ctx):
-	ctx.add("Test1")
-	ctx.add("Test2")
-	ctx.add("Test12")
-
-
-
+	for i in range(256):
+		ctx.add("Test_" + str(i))

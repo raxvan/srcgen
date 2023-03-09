@@ -1,6 +1,6 @@
 
 import os
-
+import numpy
 
 def write_to_file(content, file):
 	f = open(file, "w")
@@ -11,8 +11,13 @@ def write_to_file(content, file):
 def append(line, depth, content):
 	return line + "\t" * depth + content + "\n"
 
-def simple_hash(s):
-	return 0
+def simple_string_hash(s):
+	hash_value = numpy.uint32(1423)
+
+	for c in s:
+		hash_value = (hash_value << numpy.uint32(4)) + numpy.uint32(ord(c))
+
+	return hash_value
 
 ################################################################################################
 ################################################################################################
@@ -188,7 +193,7 @@ class EnumBuilder():
 			items_with_this_length = lengths[current_size]
 
 			for kname, aname in items_with_this_length:
-				s = append(s, depth + 3, f'if (name_hash == {simple_hash(aname)} name_hashtest_alias("{self.aliasPrefix}{aname}"))')
+				s = append(s, depth + 3, f'if (name_hash == {simple_string_hash(aname)} && test_alias("{self.aliasPrefix}{aname}"))')
 				s = append(s, depth + 4, f'return Enum::{self.enumPrefix}{kname};')
 
 			s = append(s, depth + 3, f'break;')

@@ -9,14 +9,14 @@ namespace gs
 
 	struct utils
 	{
+
 		static inline uint32_t simple_string_hash(const char* s, const std::size_t sz)
 		{
-			uint32_t hash = 5381;
+			//same as cpp_generate.py hash func
+			uint32_t hash_value = 1423;
 			for(std::size_t i = 0; i < sz;i++)
-			{
-				hash = ((hash << 5) + hash) + (*s++);
-			}
-			return hash;
+				hash_value = (hash_value << 4) + uint32_t(*s++);
+			return hash_value;
 		}
 	};
 
