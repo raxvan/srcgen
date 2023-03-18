@@ -172,8 +172,8 @@ class EnumBuilder():
 
 		s = append(s, depth + 1, f'if(std::strncmp(_name, "{self.aliasPrefix}", {prefixlen}) != 0)')
 		s = append(s, depth + 2, f"return {self.classname}::Enum::kCount;")
-		s = append(s, depth + 1, "const char* test_str = _name + 6;")
-		s = append(s, depth + 1, "std::size_t test_size = nmsize - 6;")
+		s = append(s, depth + 1, f"const char* test_str = _name + {prefixlen};")
+		s = append(s, depth + 1, f"std::size_t test_size = nmsize - {prefixlen};")
 		s = append(s, depth + 1, "uint32_t name_hash = gs::utils::simple_string_hash(test_str, test_size);")
 		s = append(s, depth + 1, "auto test_alias = [=](const char* eref) -> bool {")
 		s = append(s, depth + 2, f"return std::strncmp(eref + {prefixlen}, test_str, test_size) == 0;")
