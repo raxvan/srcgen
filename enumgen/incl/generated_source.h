@@ -51,6 +51,12 @@ namespace gs
 		{
 			return uint32_t(ev);
 		}
+		template <base_enum_t evalue>
+		constexpr static uint32_t index()
+		{
+			static_assert(evalue != base_enum_t::kCount, "Count is not allowed to be used as index!");
+			return uint32_t(evalue);
+		}
 	public:
 		using B::name;
 		inline static std::string_view name(const uint32_t index)
@@ -64,6 +70,16 @@ namespace gs
 			for(uint32_t i = 0; i < base_enum_t::kCount; i++)
 				_func(parse(i));
 		}
+
+	};
+
+
+
+	template <class S>
+	struct StructUtils : public S
+	{
+	public:
+		using base_struct_t = S;
 
 	};
 

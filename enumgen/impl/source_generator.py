@@ -96,13 +96,25 @@ def generate(name, module_list):
 	for ctx, abspath in contexts:
 		if hasattr(ctx, "generate_cpp_enum"):
 			import cpp_generator
+
 			generate_func = getattr(ctx,"generate_cpp_enum")
 
-			ctx = cpp_generator.EnumBuilder(EnumConstructor(evalue))
-			generate_func(ctx)
+			ec = EnumConstructor(evalue)
+
+			ectx = cpp_generator.EnumBuilder(ec)
+			generate_func(ectx)
 
 			basepath, name = os.path.split(abspath)
-			ctx.build(module_list, basepath)
+			ectx.build(module_list, basepath)
+
+			if hasattr(ctx, "generate_cpp_struct"):
+
+				generate_func = getattr(ctx,"generate_cpp_struct")
+
+				sctx = cpp_generator.StructBuilder(ec, ectx)
+				generate_func(sctx)
+				sctx.build(module_list, basepath)
+
 
 	return evalue
 

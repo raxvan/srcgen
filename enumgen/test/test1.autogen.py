@@ -31,3 +31,5 @@ def generate_cpp_enum(ctx):
 	ctx.classname = "TestEnum"
 
 	ctx.output = "out"
+
+

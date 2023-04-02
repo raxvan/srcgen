@@ -13,6 +13,7 @@ def construct(ctx):
 def autogenerate():
 	return [
 		"../test/test1.autogen.py",
+		"../test/test2.autogen.py",
 		"../test/other/test1.autogen.py"
 	]
 
