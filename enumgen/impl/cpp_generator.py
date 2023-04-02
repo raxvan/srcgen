@@ -260,8 +260,8 @@ class StructBuilder():
 		self.namespace = None
 		self.output = None
 
-		self.type_alias = None
-		self.type_default = None
+		self.type_alias = "type_alias"
+		self.type_default = "type_default"
 
 
 		self._module = ec.enum
@@ -269,17 +269,17 @@ class StructBuilder():
 		self._senum_builder = enum_builder
 
 	def _get_type_alias(self, name):
-		p = self._build.get_property(name, "type_alias")
+		p = self._build.get_property(name, self.type_alias)
 		if isinstance(p, str):
 			return p
 
 		return name
 	def _get_type_default(self, name):
-		p = self._build.get_property(name, "type_default")
+		p = self._build.get_property(name, self.type_default)
 		if isinstance(p, str):
 			return p
 
-		return name
+		return ""
 
 	def build(self, refmodules, baseout):
 		outdir = os.path.join(baseout, self.output)
@@ -309,8 +309,11 @@ class StructBuilder():
 			s = append(s, 0, "{")
 			s = s + self.build_struct(1)
 			s = append(s, 0, "}")
+
+			s = s + self.build_struct_visiter(0);
 		else:
 			s = s + self.build_struct(0)
+			s = s + self.build_struct_visiter(0);
 
 		return s
 
@@ -323,10 +326,16 @@ class StructBuilder():
 		hash_key = self._senum_builder._key
 
 		struct_namespace = ""
+		full_classname = self.classname
 		if(self.namespace != None):
+			full_classname = self.namespace + "::" + full_classname
 			struct_namespace = self.namespace + "_"
 			struct_namespace = struct_namespace.upper();
 
+
+		enum_class = self._senum_builder.classname
+		if self._senum_builder.namespace != None:
+			enum_class = f"{self._senum_builder.namespace}::{enum_class}"
 
 		s = append(s, depth, f"#define GSTRUCT_{struct_namespace}{self.classname.upper()}_KEY {hash_key}")
 
@@ -334,56 +343,41 @@ class StructBuilder():
 		s = append(s, depth + 0, f"struct {self.classname}")
 		s = append(s, depth + 0, "{")
 		s = append(s, depth + 0, "public:")
+		s = append(s, depth + 1 , f"using model_t = {enum_class};")
 		s = append(s, depth + 1 , f"constexpr static uint32_t key() {{ return {hash_key}; }}")
+		s = append(s, depth + 1 , f"constexpr static uint32_t member_count() {{ return {len(index_order)}; }}")
 		s = append(s, depth + 0, "public:")
 
 		#decl
 		for k,i in index_order:
 			s = append(s, depth + 1, f"{self._get_type_alias(k)} {k} = {self._get_type_default(k)};")
 
-		s = append(s, depth + 0, "public:")
-		enum_class = self._senum_builder.classname
-		if self._senum_builder.namespace != None:
-			enum_class = f"{self._senum_builder.namespace}::{enum_class}"
-
-		s = append(s, depth + 1, f"template <uint32_t> struct member_visiter;")
-
-		for k,i in index_order:
-			s = append(s, depth + 1, f"template <> struct member_visiter <{i}u> {{")
-			s = append(s, depth + 2, f"template <class FUNC> static auto visit(const {self.classname}& _content, const FUNC& _func) {{ return _func(_content.{k}); }}")
-			s = append(s, depth + 2, f"template <class FUNC> static auto visit({self.classname}& _content, const FUNC& _func) {{ return _func(_content.{k}); }}")
-			s = append(s, depth + 1, f"}};")
-
-
-		s = append(s, depth + 0, "public:")
-		s = append(s, depth + 1, "template <uint32_t ... IDS, class FUNC>//void FUNC(MEMBER_TYPE member)")
-		s = append(s, depth + 1, "inline void long_visit(const FUNC& _func) const")
-		s = append(s, depth + 1, "{")
-		s = append(s, depth + 2, "(..., member_visiter<IDS>::visit(*this, _func));")
-		s = append(s, depth + 1, "}")
-		s = append(s, depth + 1, "template <uint32_t ... IDS, class FUNC>//void FUNC(MEMBER_TYPE member)")
-		s = append(s, depth + 1, "inline void long_visit(const FUNC& _func)")
-		s = append(s, depth + 1, "{")
-		s = append(s, depth + 2, "(..., member_visiter<IDS>::visit(*this, _func));")
-		s = append(s, depth + 1, "}")
-		s = append(s, depth + 1, "public:")
-		s = append(s, depth + 1, "template <uint32_t ... IDS, class FUNC>//bool FUNC(MEMBER_TYPE member)")
-		s = append(s, depth + 1, "inline void short_visit(const FUNC& _func) const")
-		s = append(s, depth + 1, "{")
-		s = append(s, depth + 2, "(... && member_visiter<IDS>::visit(*this, _func));")
-		s = append(s, depth + 1, "}")
-		s = append(s, depth + 1, "template <uint32_t ... IDS, class FUNC>//bool FUNC(MEMBER_TYPE member)")
-		s = append(s, depth + 1, "inline void short_visit(const FUNC& _func)")
-		s = append(s, depth + 1, "{")
-		s = append(s, depth + 2, "(... && member_visiter<IDS>::visit(*this, _func));")
-		s = append(s, depth + 1, "}")
-
 		#end struct:
 		s = append(s, depth, "};")
 
 		return s
 
+	def build_struct_visiter(self, depth):
+		index_order = self._build.build_sorted_order()
 
+		s = ""
+
+		full_classname = self.classname
+		if(self.namespace != None):
+			full_classname = self.namespace + "::" + full_classname
+
+		s = append(s, depth + 0, "namespace _gs_detail")
+		s = append(s, depth + 0, "{")
+
+		for k,i in index_order:
+			s = append(s, depth + 1, f"template <> struct member_visiter <{full_classname}, {i}u> {{")
+			s = append(s, depth + 2, f"inline static const auto& get(const {full_classname}& _content) {{ return _content.{k}; }}")
+			s = append(s, depth + 2, f"inline static auto& get({full_classname}& _content) {{ return _content.{k}; }}")
+			s = append(s, depth + 1, f"}};")
+
+		s = append(s, depth + 0, "};")
+
+		return s
 
 
 

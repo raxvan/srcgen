@@ -4,12 +4,17 @@
 #include <cstring>
 #include <string_view>
 
+namespace _gs_detail
+{
+	template <class S, uint32_t>
+	struct member_visiter;
+}
+
 namespace gs
 {
 
 	struct utils
 	{
-
 		static inline uint32_t simple_string_hash(const char* s, const std::size_t sz)
 		{
 			// same as cpp_generate.py hash func
@@ -19,6 +24,8 @@ namespace gs
 			return hash_value;
 		}
 	};
+
+	//--------------------------------------------------------------------------------------------------------------------------------
 
 	template <class B>
 	struct EnumUtils : public B
@@ -74,11 +81,47 @@ namespace gs
 		}
 	};
 
+	//--------------------------------------------------------------------------------------------------------------------------------
+
 	template <class S>
 	struct StructUtils : public S
 	{
 	public:
 		using base_struct_t = S;
+
+
+	public:
+		template <uint32_t ... IDS, class FUNC>
+		void long_visit(const FUNC& _func)
+		{
+			(..., _func(get<IDS>()));
+		}
+		template <uint32_t ... IDS, class FUNC>
+		void long_visit(const FUNC& _func) const
+		{
+			(..., _func(get<IDS>()));
+		}
+		template <uint32_t ... IDS, class FUNC>
+		bool short_visit(const FUNC& _func)
+		{
+			return (... && _func(get<IDS>()));
+		}
+		template <uint32_t ... IDS, class FUNC>
+		bool short_visit(const FUNC& _func) const
+		{
+			return (... && _func(get<IDS>()));
+		}
+	public:
+		template <uint32_t I>
+		inline const auto& get() const
+		{
+			return typename _gs_detail::member_visiter<S, I>::get(*this);
+		}
+		template <uint32_t I>
+		inline auto& get()
+		{
+			return typename _gs_detail::member_visiter<S, I>::get(*this);
+		}
 	};
 
 };

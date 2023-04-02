@@ -24,5 +24,5 @@ def generate_cpp_struct(ctx):
 	ctx.classname = "TestStruct2"
 	ctx.output = "out"
 
-	ctx.type_alias = "ctype"
-	ctx.type_default = "default"
+	ctx.type_alias = "type_alias"
+

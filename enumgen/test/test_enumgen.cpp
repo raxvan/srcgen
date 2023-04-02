@@ -55,15 +55,21 @@ void test_generated_struct()
 
 	t		 tmp;
 	uint32_t c = 0;
-	tmp.long_visit<test_enum::TestEnum2::enum_member1, test_enum::TestEnum2::enum_member2>([&](const auto& m) { handle_value(c, m); });
+	tmp.long_visit<test_enum::TestEnum2::enum_member1, test_enum::TestEnum2::enum_member2>([&](const auto& m) {
+		handle_value(c, m);
+	});
 	TEST_ASSERT(c == 2);
 
 	c = 0;
-	tmp.long_visit<test_enum::TestEnum2::enum_member1>([&](const auto& m) { handle_value(c, m); });
+	tmp.long_visit<test_enum::TestEnum2::enum_member1>([&](const auto& m) {
+		handle_value(c, m);
+	});
 	TEST_ASSERT(c == 1);
 
 	c = 0;
-	tmp.short_visit<test_enum::TestEnum2::enum_member1, test_enum::TestEnum2::enum_member2>([&](const auto& m) { return handle_value(c, m); });
+	tmp.short_visit<test_enum::TestEnum2::enum_member1, test_enum::TestEnum2::enum_member2>([&](const auto& m) { 
+		return handle_value(c, m);
+	});
 	TEST_ASSERT(c == 1);
 }
 
