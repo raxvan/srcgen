@@ -9,7 +9,7 @@ namespace sg
 	bool compiletime_identifier::is(const std::string_view& sv) const
 	{
 		REFLECTION_ASSERT(size > 0 && sv.size() > 0);
-		if(size != sv.size())
+		if (size != sv.size())
 			return false;
 
 		REFLECTION_ASSERT(id != nullptr);

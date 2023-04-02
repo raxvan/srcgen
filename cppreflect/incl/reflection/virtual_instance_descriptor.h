@@ -12,15 +12,17 @@ namespace sg
 		struct ITypeVisiter
 		{
 		public:
-			virtual void operator ()(const compiletime_identifier& ci) = 0;
+			virtual void operator()(const compiletime_identifier& ci) = 0;
 		};
+
 	protected:
 		template <class>
 		friend struct impl_instance_descriptor_helper;
 
 		virtual compiletime_identifier _get_final_instance_id() const = 0;
 		virtual bool				   _is_instance_recursive(const compiletime_identifier& ik) const = 0;
-		virtual void 				   _gather_types(ITypeVisiter& visiter) const = 0;
+		virtual void				   _gather_types(ITypeVisiter& visiter) const = 0;
+
 	public:
 		template <class T>
 		inline T* cast();
@@ -124,19 +126,19 @@ namespace sg
 //--------------------------------------------------------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------------------------------------------------------
 
-#define IMPL_TYPEID_CUSTOM_STR(STR)                                  \
-	constexpr static sg::compiletime_identifier _get_static_type_id()                 \
-	{                                                                \
-		constexpr auto r = sg::compiletime_identifier::create(#STR); \
-		return r;                                                    \
+#define IMPL_TYPEID_CUSTOM_STR(STR)                                   \
+	constexpr static sg::compiletime_identifier _get_static_type_id() \
+	{                                                                 \
+		constexpr auto r = sg::compiletime_identifier::create(#STR);  \
+		return r;                                                     \
 	}
 
 //--------------------------------------------------------------------------------------------------------------------------------
 
 #if defined(__cpp_lib_source_location) && 0
-	//this seems to be broken on msvc, switching to "default"
+// this seems to be broken on msvc, switching to "default"
 #	define IMPL_TYPEID_DEFAULT_STR()                                                               \
-		constexpr static sg::compiletime_identifier _get_static_type_id()                                            \
+		constexpr static sg::compiletime_identifier _get_static_type_id()                           \
 		{                                                                                           \
 			constexpr auto r = sg::compiletime_identifier::create(std::source_location::current()); \
 			return r;                                                                               \
@@ -150,7 +152,7 @@ namespace sg
 #	define SRCGEN_LOCATION __FILE__ "::" SRCGEN_LINET_TO_STR_MACRO(__LINE__)
 
 #	define IMPL_TYPEID_DEFAULT_STR()                                               \
-		constexpr static sg::compiletime_identifier _get_static_type_id()                            \
+		constexpr static sg::compiletime_identifier _get_static_type_id()           \
 		{                                                                           \
 			constexpr auto r = sg::compiletime_identifier::create(SRCGEN_LOCATION); \
 			return r;                                                               \
@@ -166,15 +168,15 @@ namespace sg
 	friend struct sg::impl_instance_descriptor_helper;                                       \
 	virtual sg::compiletime_identifier _get_final_instance_id() const override               \
 	{                                                                                        \
-		return _get_static_type_id();                                                               \
+		return _get_static_type_id();                                                        \
 	}                                                                                        \
 	virtual bool _is_instance_recursive(const sg::compiletime_identifier& ik) const override \
 	{                                                                                        \
 		return sg::impl_instance_descriptor_helper<BASE>::impl_is_instance(ik, this);        \
-	} \
-	virtual void _gather_types(InstanceDescriptor::ITypeVisiter& visiter) const override \
-	{ \
-		sg::impl_instance_descriptor_helper<BASE>::impl_visit_types(visiter, this); \
+	}                                                                                        \
+	virtual void _gather_types(InstanceDescriptor::ITypeVisiter& visiter) const override     \
+	{                                                                                        \
+		sg::impl_instance_descriptor_helper<BASE>::impl_visit_types(visiter, this);          \
 	}
 
 //--------------------------------------------------------------------------------------------------------------------------------

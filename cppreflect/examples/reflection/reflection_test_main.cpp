@@ -6,19 +6,18 @@
 #include <iostream>
 #include <vector>
 
-
 void test_type_visit()
 {
 	struct Visiter : public sg::InstanceDescriptor::ITypeVisiter
 	{
 		std::vector<sg::compiletime_identifier> data;
-		virtual void operator ()(const sg::compiletime_identifier& i) override
+		virtual void							operator()(const sg::compiletime_identifier& i) override
 		{
 			data.push_back(i);
 		}
 	};
 	test_type4 t;
-	Visiter v;
+	Visiter	   v;
 	t.visit_types(v);
 
 	auto f = [&](const sg::compiletime_identifier& i) {
@@ -30,8 +29,6 @@ void test_type_visit()
 	TTF_ASSERT(f(sg::class_identifier_from<test_type3>::value()) == false);
 	TTF_ASSERT(f(sg::class_identifier_from<test_type2>::value()) == true);
 	TTF_ASSERT(f(sg::class_identifier_from<test_type4>::value()) == true);
-
-	
 }
 
 template <class T>
@@ -49,58 +46,58 @@ void validate_is_not(const base_type* ct, base_type* t)
 
 void test_instance_decl()
 {
-	base_type* i = nullptr;
+	base_type*		 i = nullptr;
 	const base_type* ci = nullptr;
 
 	TEST_INLINE() = [&]() {
 		test_type1 t;
 		i = &t;
 		ci = &t;
-		validate_is_instance<test_type1>(ci,i);
+		validate_is_instance<test_type1>(ci, i);
 
-		validate_is_not<test_type2>(ci,i);
-		validate_is_not<test_type3>(ci,i);
-		validate_is_not<test_type4>(ci,i);
+		validate_is_not<test_type2>(ci, i);
+		validate_is_not<test_type3>(ci, i);
+		validate_is_not<test_type4>(ci, i);
 	};
 
 	TEST_INLINE() = [&]() {
 		test_type2 t;
 		i = &t;
 		ci = &t;
-		validate_is_instance<test_type2>(ci,i);
+		validate_is_instance<test_type2>(ci, i);
 
-		validate_is_not<test_type1>(ci,i);
-		validate_is_not<test_type3>(ci,i);
-		validate_is_not<test_type4>(ci,i);
+		validate_is_not<test_type1>(ci, i);
+		validate_is_not<test_type3>(ci, i);
+		validate_is_not<test_type4>(ci, i);
 	};
 
 	TEST_INLINE() = [&]() {
 		test_type3 t;
 		i = &t;
 		ci = &t;
-		validate_is_instance<test_type3>(ci,i);
+		validate_is_instance<test_type3>(ci, i);
 
-		validate_is_not<test_type1>(ci,i);
-		validate_is_not<test_type2>(ci,i);
-		validate_is_not<test_type4>(ci,i);
+		validate_is_not<test_type1>(ci, i);
+		validate_is_not<test_type2>(ci, i);
+		validate_is_not<test_type4>(ci, i);
 	};
 
 	TEST_INLINE() = [&]() {
 		test_type4 t;
 		i = &t;
 		ci = &t;
-		validate_is_instance<test_type2>(ci,i);
-		validate_is_instance<test_type4>(ci,i);
+		validate_is_instance<test_type2>(ci, i);
+		validate_is_instance<test_type4>(ci, i);
 
-		validate_is_not<test_type1>(ci,i);
-		validate_is_not<test_type3>(ci,i);
+		validate_is_not<test_type1>(ci, i);
+		validate_is_not<test_type3>(ci, i);
 	};
 }
 
 void test_compiletime_identifier()
 {
 	constexpr sg::compiletime_identifier a = sg::compiletime_identifier::create("hello1");
-	constexpr sg::compiletime_identifier b = sg::compiletime_identifier::create("hello2_", 6); //this could cause some problems
+	constexpr sg::compiletime_identifier b = sg::compiletime_identifier::create("hello2_", 6); // this could cause some problems
 	constexpr sg::compiletime_identifier c = "hello3"_id;
 
 	static_assert(a.size == 6, "...");

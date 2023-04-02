@@ -13,8 +13,8 @@ namespace sg
 	struct compiletime_identifier
 	{
 	public:
-		uint32_t hash = 0;
-		uint32_t size = 0; // name size
+		uint32_t	hash = 0;
+		uint32_t	size = 0; // name size
 		const char* id = nullptr;
 
 	public:
@@ -29,6 +29,7 @@ namespace sg
 		{
 			return std::string_view(id, size);
 		}
+
 	public:
 		bool is(const std::string_view& sv) const;
 
@@ -58,6 +59,7 @@ namespace sg
 
 		compiletime_identifier(compiletime_identifier&&) = default;
 		compiletime_identifier& operator=(compiletime_identifier&&) = default;
+
 	private:
 		constexpr compiletime_identifier(const uint32_t h, const uint32_t s, const char* i)
 			: hash(h)

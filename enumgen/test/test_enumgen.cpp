@@ -29,7 +29,6 @@ void test_all_visit()
 
 		index++;
 	});
-
 }
 
 bool handle_value(uint32_t& c, int v)
@@ -54,25 +53,18 @@ void test_generated_struct()
 	static_assert(sizeof(test_struct::TestStruct2) == sizeof(int) * test_enum::TestEnum2::kCount, "Error");
 	static_assert(test_struct::TestStruct2::key() == test_enum::TestEnum2::key(), "Error");
 
-	t tmp;
+	t		 tmp;
 	uint32_t c = 0;
-	tmp.long_visit< test_enum::TestEnum2::enum_member1, test_enum::TestEnum2::enum_member2>([&](const auto& m){
-		handle_value(c,m);
-	});
+	tmp.long_visit<test_enum::TestEnum2::enum_member1, test_enum::TestEnum2::enum_member2>([&](const auto& m) { handle_value(c, m); });
 	TEST_ASSERT(c == 2);
 
 	c = 0;
-	tmp.long_visit< test_enum::TestEnum2::enum_member1>([&](const auto& m) {
-		handle_value(c, m);
-		});
+	tmp.long_visit<test_enum::TestEnum2::enum_member1>([&](const auto& m) { handle_value(c, m); });
 	TEST_ASSERT(c == 1);
 
 	c = 0;
-	tmp.short_visit< test_enum::TestEnum2::enum_member1, test_enum::TestEnum2::enum_member2>([&](const auto& m) {
-		return handle_value(c, m);
-	});
+	tmp.short_visit<test_enum::TestEnum2::enum_member1, test_enum::TestEnum2::enum_member2>([&](const auto& m) { return handle_value(c, m); });
 	TEST_ASSERT(c == 1);
-
 }
 
 void test_speed()
@@ -84,9 +76,7 @@ void test_speed()
 	for (std::size_t i = 0; i < total; i++)
 	{
 		bool b = true;
-		t::iterate([&](t::Enum e) {
-			b = b && t::parse(t::name(e)) == e;
-			});
+		t::iterate([&](t::Enum e) { b = b && t::parse(t::name(e)) == e; });
 		if (b)
 			c++;
 	}
@@ -100,6 +90,5 @@ void test_main()
 	TEST_FUNCTION(test_generated_struct);
 
 	TEST_FUNCTION(test_speed);
-
 }
 TEST_MAIN(test_main)
